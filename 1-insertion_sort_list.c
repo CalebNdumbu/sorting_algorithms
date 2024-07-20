@@ -1,41 +1,58 @@
-#include "sort.h"
 #include <stdio.h>
+#include "sort.h"
 
 /**
  * insertion_sort_list - Sorts a doubly linked list of integers in ascending order using Insertion Sort
- * @list: The doubly linked list to be sorted
+ * @list: 
+ * The doubly linked list to be sorted
  */
 void insertion_sort_list(listint_t **list)
 {
-    listint_t *current, *temp, *swap;
+    listint_t *current, *next, *prev;
 
-    if (list == NULL || *list == NULL || (*list)->next == NULL)
+
+    if (*list == NULL || (*list)->next == NULL)
         return;
 
     current = (*list)->next;
-    while (current != NULL)
+
+    while (current)
     {
-        temp = current;
-        while (temp->prev != NULL && temp->n < temp->prev->n)
+        next = current->next;
+
+
+        prev = *list;
+        while (prev && prev->n < current->n)
+            prev = prev->next;
+
+        if (prev != current->prev)
         {
-            swap = temp->prev;
-            // Swap the nodes
-            if (swap->prev != NULL)
-                swap->prev->next = temp;
-            if (temp->next != NULL)
-                temp->next->prev = swap;
-            
-            swap->next = temp->next;
-            temp->prev = swap->prev;
-            swap->prev = temp;
-            temp->next = swap;
 
-            // Update the head of the list if necessary
-            if (temp->prev == NULL)
-                *list = temp;
+            if (current->prev)
+                current->prev->next = current->next;
+            if (current->next)
+                current->next->prev = current->prev;
 
-            print_list(*list);
+
+            if (prev)
+            {
+                current->next = prev;
+                current->prev = prev->prev;
+                if (prev->prev)
+                    prev->prev->next = current;
+                else
+                    *list = current;
+                prev->prev = current;
+            }
+            else
+            {
+                current->next = *list;
+                (*list)->prev = current;
+                *list = current;
+                current->prev = NULL;
+            }
         }
-        current = current->next;
+
+        current = next;
     }
 }
